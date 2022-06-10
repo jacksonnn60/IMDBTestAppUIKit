@@ -33,14 +33,6 @@ final class HTTPClient: IHTTPClient {
 // MARK: - Private
 
 private extension HTTPClient {
-    func extractError(error: Error?) -> Error {
-        guard error == nil else {
-            return error ?? "Something went wrong."
-        }
-        
-        return ""
-    }
-    
     func executeRequest<T: Codable>(_ request: URLRequest, completion: @escaping ResultClosure<T>) {
         urlSession.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
@@ -59,7 +51,7 @@ private extension HTTPClient {
                     
                     completion(.success(try JSONDecoder().decode(T.self, from: data)))
                 default:
-                    throw self.extractError(error: error)
+                    throw error
                 }
             } catch let error {
                 print("❌(\(error)) \(request.url?.path ?? "")")
