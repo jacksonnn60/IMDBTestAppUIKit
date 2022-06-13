@@ -34,9 +34,7 @@ final class HTTPClient: IHTTPClient {
 
 private extension HTTPClient {
     func executeRequest<T: Codable>(_ request: URLRequest, completion: @escaping ResultClosure<T>) {
-        urlSession.dataTask(with: request) { [weak self] data, response, error in
-            guard let self = self else { return }
-            
+        urlSession.dataTask(with: request) { data, response, error in
             do {
                 if let error = error { throw error }
                 guard let response = response as? HTTPURLResponse else { throw "Invalid response" }
@@ -51,7 +49,7 @@ private extension HTTPClient {
                     
                     completion(.success(try JSONDecoder().decode(T.self, from: data)))
                 default:
-                    throw error
+                    throw error ?? "❌Error: response is not success && error == nil"
                 }
             } catch let error {
                 print("❌(\(error)) \(request.url?.path ?? "")")
